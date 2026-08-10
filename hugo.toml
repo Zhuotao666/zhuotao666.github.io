@@ -64,6 +64,11 @@ name = 'About'
 pageRef = '/about'
 weight = 40
 
+[[menus.main]]
+name = 'cv'
+url = '/lztcv.pdf'
+weight = 50
+
 
 [build]
   [build.buildStats]
