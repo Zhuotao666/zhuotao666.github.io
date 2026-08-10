@@ -38,7 +38,7 @@ ignoreLogs = ['warning-goldmark-raw-html']
     zhihu = "https://zhihu.com/people/daucloud"
     email = "1311700152@qq.com"
   [params.avatar]
-    url = "/avatar.jpg"
+    url = "/avatar-profile.jpg"
 [[menus.main]]
 name = 'Home'
 pageRef = '/'
