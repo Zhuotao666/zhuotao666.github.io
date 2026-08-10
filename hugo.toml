@@ -1,6 +1,6 @@
 baseURL = '/'
 languageCode = 'en-US'
-Title = 'Daucloud'
+Title = 'Zhuotao Lu'
 theme = "void"
 enableGitInfo = true
 defaultContentLanguage = "en"
@@ -65,7 +65,7 @@ pageRef = '/about'
 weight = 40
 
 [[menus.main]]
-name = 'cv'
+name = 'CV'
 url = '/lztcv.pdf'
 weight = 50
 
@@ -95,12 +95,12 @@ weight = 50
   [languages.zh]
     languageName = "中文"
     weight = 2
-    title = "Daucloud's Blog"
+    title = "Zhuotao Lu"
     description = "分享知识、经验和想法"
   [languages.en]
     languageName = "English"
     weight = 1
-    title = "Daucloud's Blog"
+    title = "Zhuotao Lu"
     description = "Share knowledge, experience, and ideas"
 
 [caches]
