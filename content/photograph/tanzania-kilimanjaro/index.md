@@ -1,7 +1,7 @@
 ---
 title: "Tanzania"
 description: "Tanzania — Mount Kilimanjaro Climbing Tour"
-date: 2026-08-14
+date: 2024-01-01
 draft: false
 cover: "/photograph/tanzania-kilimanjaro/cover.jpg"
 photos:
