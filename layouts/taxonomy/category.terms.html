@@ -1,0 +1,36 @@
+{{ define "main" }}
+  {{ $albums := where site.RegularPages "Section" "photograph" }}
+  <section class="max-w-4xl mx-auto px-4 py-8">
+    <header class="mb-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100">Photograph</h1>
+    </header>
+
+    {{ if $albums }}
+      <div class="grid gap-6 sm:grid-cols-2">
+        {{ range $albums.ByDate.Reverse }}
+          {{ $album := . }}
+          <a href="{{ .RelPermalink }}" class="group block overflow-hidden rounded-lg bg-white dark:bg-slate-900 shadow-sm hover:shadow-md transition-shadow">
+            {{ with .Params.cover }}
+              <div class="aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-slate-800">
+                <img src="{{ . }}" alt="{{ $album.Title }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
+              </div>
+            {{ end }}
+            <div class="p-5">
+              <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">{{ .Title }}</h2>
+              {{ with .Description }}
+                <p class="mt-2 text-sm leading-relaxed text-gray-600 dark:text-gray-300">{{ . }}</p>
+              {{ end }}
+              {{ with .Params.photos }}
+                <p class="mt-4 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ len . }} photos</p>
+              {{ end }}
+            </div>
+          </a>
+        {{ end }}
+      </div>
+    {{ else }}
+      <div class="rounded-lg bg-white dark:bg-slate-900 p-8 text-center text-gray-600 dark:text-gray-300 shadow-sm">
+        No photograph albums yet.
+      </div>
+    {{ end }}
+  </section>
+{{ end }}
