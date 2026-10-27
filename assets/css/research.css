@@ -42,6 +42,7 @@
 }
 
 .research-card-link:focus-visible,
+.research-repository a:focus-visible,
 .research-back a:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 4px;
@@ -137,6 +138,22 @@ html.dark .research-affiliation {
   margin: 28px 0 16px;
   font-size: 24px;
   font-weight: 700;
+}
+
+.research-repository {
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.research-repository a {
+  color: #1d4ed8;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+html.dark .research-repository a {
+  color: #93c5fd;
 }
 
 .research-abstract p {

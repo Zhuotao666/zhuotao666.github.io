@@ -10,6 +10,7 @@ authors:
   - "Yuqi Song"
   - "Zhuotao Lu"
 affiliation: "The Hong Kong University of Science and Technology (Guangzhou)"
+repository_url: "https://repository.hkust-gz.edu.cn/itemDetail?id=2082671707485696002"
 weight: 10
 draft: false
 ---

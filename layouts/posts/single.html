@@ -11,6 +11,11 @@
       <h1>{{ .Title }}</h1>
       {{ with .Params.authors }}<p class="research-authors">{{ delimit . ", " }}</p>{{ end }}
       {{ with .Params.affiliation }}<p class="research-affiliation">{{ . }}</p>{{ end }}
+      {{ with .Params.repository_url }}
+        <p class="research-repository">
+          <a href="{{ . }}" target="_blank" rel="noopener noreferrer">View on HKUST(GZ) Repository</a>
+        </p>
+      {{ end }}
     </header>
     <section class="research-abstract" aria-labelledby="abstract-heading">
       <h2 id="abstract-heading">Abstract</h2>
