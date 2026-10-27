@@ -1,0 +1,23 @@
+{{ define "main" }}
+  {{ with resources.Get "css/research.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
+  {{ end }}
+  <section class="research-page" aria-labelledby="research-heading">
+    <header class="research-header">
+      <h1 id="research-heading">{{ .Title }}</h1>
+    </header>
+    <div class="research-list">
+      {{ range $index, $project := .RegularPages.ByWeight }}
+        <article class="research-card" aria-labelledby="research-project-{{ $index }}">
+          <a class="research-card-link" href="{{ .RelPermalink }}" aria-labelledby="research-project-{{ $index }}">
+            <img class="research-image" src="{{ .Params.image | relURL }}" alt="{{ .Params.image_alt }}" width="1230" height="1054" decoding="async" {{ if gt $index 0 }}loading="lazy"{{ end }}>
+            <div class="research-copy">
+              <h2 id="research-project-{{ $index }}">{{ .Params.card_title | default .Title }}</h2>
+              <p>{{ .Description }}</p>
+            </div>
+          </a>
+        </article>
+      {{ end }}
+    </div>
+  </section>
+{{ end }}

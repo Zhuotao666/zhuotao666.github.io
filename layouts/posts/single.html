@@ -1,0 +1,23 @@
+{{ define "main" }}
+  {{ with resources.Get "css/research.css" | minify | fingerprint }}
+    <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
+  {{ end }}
+  <article class="research-page research-detail">
+    <nav class="research-back" aria-label="Research navigation">
+      <a href="{{ .Parent.RelPermalink }}">&larr; Research</a>
+    </nav>
+    <header class="research-detail-header">
+      {{ with .Params.status }}<p class="research-status">{{ . }}</p>{{ end }}
+      <h1>{{ .Title }}</h1>
+      {{ with .Params.authors }}<p class="research-authors">{{ delimit . ", " }}</p>{{ end }}
+      {{ with .Params.affiliation }}<p class="research-affiliation">{{ . }}</p>{{ end }}
+    </header>
+    <section class="research-abstract" aria-labelledby="abstract-heading">
+      <h2 id="abstract-heading">Abstract</h2>
+      {{ .Content }}
+    </section>
+    <nav class="research-back research-back-bottom" aria-label="Back to research list">
+      <a href="{{ .Parent.RelPermalink }}">&larr; Research</a>
+    </nav>
+  </article>
+{{ end }}
