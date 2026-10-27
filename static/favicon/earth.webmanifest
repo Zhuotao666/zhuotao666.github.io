@@ -1,0 +1,21 @@
+{
+  "name": "Zhuotao Lu",
+  "short_name": "Zhuotao Lu",
+  "icons": [
+    {
+      "src": "earth-48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "earth-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
