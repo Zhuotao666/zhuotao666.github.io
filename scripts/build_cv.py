@@ -86,7 +86,7 @@ class CV:
         self.y = 47
         self.page = 1
 
-    def paragraph(self, text, *, size=11, leading=13.5, indent=0, after=0, align=0):
+    def paragraph(self, text, *, size=11, leading=14.5, indent=0, after=0, align=0):
         style = ParagraphStyle("cv", fontName="CV", fontSize=size, leading=leading,
                                alignment=align, textColor=colors.black)
         p = Paragraph(text, style)
@@ -99,19 +99,19 @@ class CV:
 
     def row(self, left, right, *, size=10.8, after=0):
         right_width = pdfmetrics.stringWidth(right, "CV", size) + 10
-        p = Paragraph(left, ParagraphStyle("row", fontName="CV", fontSize=size, leading=13.5))
+        p = Paragraph(left, ParagraphStyle("row", fontName="CV", fontSize=size, leading=14.5))
         _, height = p.wrap(self.RIGHT - self.LEFT - right_width, self.HEIGHT)
         p.drawOn(self.canvas, self.LEFT, self.HEIGHT - self.y - height)
         self.canvas.setFont("CV", size)
         self.canvas.drawRightString(self.RIGHT, self.HEIGHT - self.y - size, right)
         self.y += height + after
 
-    def section(self, title, *, before=10):
+    def section(self, title, *, before=20):
         self.y += before
-        self.paragraph(title, size=13, leading=16)
+        self.paragraph("<b>" + title + "</b>", size=13, leading=17)
         self.canvas.setLineWidth(0.45)
         self.canvas.line(self.LEFT, self.HEIGHT - self.y, self.RIGHT, self.HEIGHT - self.y)
-        self.y += 7
+        self.y += 9
 
     def bullet(self, text, *, after=5):
         self.canvas.setFont("CV", 10.5)
@@ -133,7 +133,7 @@ def build(output, font_dir):
     cv.paragraph("PhD Candidate in Carbon Neutrality and Climate Change", align=1)
     cv.paragraph("The Hong Kong University of Science and Technology (Guangzhou)", align=1, after=5)
     cv.paragraph('Email: <link href="mailto:zlu526@connect.hkust-gz.edu.cn">zlu526@connect.hkust-gz.edu.cn</link> &nbsp; | &nbsp; Tel: (+86) 130 7829 3713', align=1, size=10.5)
-    cv.section("Education", before=11)
+    cv.section("Education", before=17)
     cv.row("<b>The Hong Kong University of Science and Technology (Guangzhou)</b>", "Feb. 2025 - Present", size=10.5)
     cv.row("<i>PhD Candidate in Carbon Neutrality and Climate Change, Society Hub</i>", "GPA: 3.87 / 4.30", size=10.5, after=6)
     cv.row("<b>The Hong Kong Polytechnic University</b>", "Oct. 2024")
@@ -141,7 +141,7 @@ def build(output, font_dir):
     cv.row("<i>With Distinction</i>", "GPA: 3.77 / 4.30", size=10.5, after=6)
     cv.row("<b>Guangdong University of Finance and Economics</b>", "Jul. 2022")
     cv.row("<i>BSc in Economics, International Economics and Trade</i>", "GPA: 87.3 / 100", size=10.5)
-    cv.section("Ongoing Research Projects", before=11)
+    cv.section("Ongoing Research Projects", before=19)
     for project in PROJECTS:
         title = "<b>" + project["title"] + "</b>"
         if project.get("status"):
@@ -150,9 +150,9 @@ def build(output, font_dir):
         authors = project["authors"]
         if project.get("url"):
             authors += ' &nbsp; <link href="' + project["url"] + '" color="#194B85"><u>Link</u></link>'
-        cv.paragraph(authors, indent=13, size=10.5, leading=13)
+        cv.paragraph(authors, indent=13, size=10.5, leading=14)
         if project.get("funding"):
-            cv.paragraph("<i>" + project["funding"] + ".</i>", indent=13, size=10, leading=12)
+            cv.paragraph("<i>" + project["funding"] + ".</i>", indent=13, size=10, leading=13)
         cv.y += 7
     print(f"Research ends at {cv.y:.1f}pt on page 1")
     cv.finish_page()
@@ -172,7 +172,7 @@ def build(output, font_dir):
     cv.bullet("Participated in third-party evaluation of Guangdong online trade exhibition projects.")
     cv.bullet("Collected questionnaire data and prepared evaluation reports supporting government trade policy design.", after=0)
 
-    cv.section("Honors &amp; Prizes", before=12)
+    cv.section("Honors &amp; Prizes")
     for date, award in [
         ("2024.05", "Top Research Project Winner, ESG and Sustainability Capstone Project"),
         ("2022.06", "Excellent Undergraduate Thesis Award"),
@@ -183,10 +183,10 @@ def build(output, font_dir):
         ("2020.10", "Academic Excellence Scholarship"),
     ]:
         cv.paragraph(date + " &nbsp; &nbsp; " + award, after=1)
-    cv.section("Languages &amp; Technical Skills", before=12)
+    cv.section("Languages &amp; Technical Skills")
     cv.paragraph("<b>Languages:</b> Mandarin (Native), Cantonese (Native), English (Fluent)", after=5)
     cv.paragraph("<b>Technical Skills:</b> Stata, R, GIS, MS Office")
-    cv.section("Research Interests", before=12)
+    cv.section("Research Interests")
     cv.paragraph("Climate change economics, climate and energy policy, policy evaluation, climate risk, climate justice, ESG disclosure and rating, climate resilience and climate adaptation of cities and communities.")
     print(f"Content ends at {cv.y:.1f}pt on page 2")
     cv.finish_page()
