@@ -6,7 +6,6 @@ from pathlib import Path
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph
 
@@ -57,11 +56,30 @@ class CV:
     LEFT, RIGHT = 45, 567
 
     def __init__(self, path, font_dir):
-        for name, filename in [("CV", "times.ttf"), ("CV-Bold", "timesbd.ttf"),
-                               ("CV-Italic", "timesi.ttf"), ("CV-BoldItalic", "timesbi.ttf")]:
-            pdfmetrics.registerFont(TTFont(name, str(font_dir / filename)))
+        encoding = pdfmetrics.Encoding("CVWinAnsi", "WinAnsiEncoding")
+        # Use the standard bullet code point so PDF text extraction stays readable.
+        for code, glyph in enumerate(encoding.vector):
+            if glyph == "bullet" and code != 149:
+                encoding[code] = ".notdef"
+        pdfmetrics.registerEncoding(encoding)
+        # Embed the same Latin Modern family used by the original LaTeX CV.
+        for name, filename in [("CV", "lmr10"), ("CV-Bold", "lmbx10"),
+                               ("CV-Italic", "lmri10"), ("CV-BoldItalic", "lmbxi10"),
+                               ("CV-Display", "lmbx12")]:
+            face = pdfmetrics.EmbeddedType1Face(
+                str(font_dir / (filename + ".afm")),
+                str(font_dir / (filename + ".pfb")),
+            )
+            # ReportLab's AFM reader leaves fractional vertical metrics as strings.
+            for metric in ("ascent", "descent", "capHeight", "xHeight"):
+                setattr(face, metric, float(getattr(face, metric)))
+            pdfmetrics.registerTypeFace(face)
+            font = pdfmetrics.Font(name, face.name, "CVWinAnsi")
+            font.encName = "cp1252"
+            pdfmetrics.registerFont(font)
         pdfmetrics.registerFontFamily("CV", normal="CV", bold="CV-Bold",
                                       italic="CV-Italic", boldItalic="CV-BoldItalic")
+        pdfmetrics.registerFontFamily("CV-Display", normal="CV-Display")
         self.canvas = canvas.Canvas(str(path), pagesize=(self.WIDTH, self.HEIGHT))
         self.canvas.setTitle("Zhuotao Lu - Curriculum Vitae")
         self.canvas.setAuthor("Zhuotao Lu")
@@ -111,7 +129,7 @@ class CV:
 def build(output, font_dir):
     output.parent.mkdir(parents=True, exist_ok=True)
     cv = CV(output, font_dir)
-    cv.paragraph("<b>Zhuotao Lu</b>", size=20, leading=24, align=1, after=4)
+    cv.paragraph('<font name="CV-Display">Zhuotao Lu</font>', size=20, leading=24, align=1, after=4)
     cv.paragraph("PhD Candidate in Carbon Neutrality and Climate Change", align=1)
     cv.paragraph("The Hong Kong University of Science and Technology (Guangzhou)", align=1, after=5)
     cv.paragraph('Email: <link href="mailto:zlu526@connect.hkust-gz.edu.cn">zlu526@connect.hkust-gz.edu.cn</link> &nbsp; | &nbsp; Tel: (+86) 130 7829 3713', align=1, size=10.5)
@@ -178,6 +196,7 @@ def build(output, font_dir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--font-dir", type=Path, default=Path("C:/Windows/Fonts"))
+    parser.add_argument("--font-dir", type=Path,
+                        default=Path(__file__).resolve().parent / "fonts" / "latin-modern")
     args = parser.parse_args()
     build(args.output, args.font_dir)

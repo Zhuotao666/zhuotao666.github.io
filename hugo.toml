@@ -56,7 +56,7 @@ weight = 25
 
 [[menus.main]]
 name = 'CV'
-url = '/lztcv-20261030.pdf'
+url = '/lztcv-20261030-lm.pdf'
 weight = 50
 
 
