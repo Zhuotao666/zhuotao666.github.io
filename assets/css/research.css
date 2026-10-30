@@ -167,6 +167,30 @@ html.dark .research-repository a {
   margin: 36px 0 0;
 }
 
+.research-video {
+  margin-top: 28px;
+}
+
+.research-video video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  object-fit: contain;
+}
+
+.research-video video:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 4px;
+}
+
+.research-video-summary {
+  margin: 24px 0 0;
+  font-size: 18px;
+  line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
 @media (max-width: 639px) {
   .research-header h1 {
     font-size: 30px;

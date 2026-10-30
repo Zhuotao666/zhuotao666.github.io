@@ -10,7 +10,7 @@
       {{ range $index, $project := .RegularPages.ByWeight }}
         <article class="research-card" aria-labelledby="research-project-{{ $index }}">
           <a class="research-card-link" href="{{ .RelPermalink }}" aria-labelledby="research-project-{{ $index }}">
-            <img class="research-image" src="{{ .Params.image | relURL }}" alt="{{ .Params.image_alt }}" width="1230" height="1054" decoding="async" {{ if gt $index 0 }}loading="lazy"{{ end }}>
+            <img class="research-image" src="{{ .Params.image | relURL }}" alt="{{ .Params.image_alt }}" width="{{ .Params.image_width | default 1230 }}" height="{{ .Params.image_height | default 1054 }}" decoding="async" {{ if gt $index 0 }}loading="lazy"{{ end }}>
             <div class="research-copy">
               <h2 id="research-project-{{ $index }}">{{ .Params.card_title | default .Title }}</h2>
               <p>{{ .Description }}</p>

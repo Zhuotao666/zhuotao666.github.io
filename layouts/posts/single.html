@@ -17,10 +17,20 @@
         </p>
       {{ end }}
     </header>
+    {{ if .Params.video }}
+    <section class="research-video" aria-label="{{ .Title }} video">
+      <video controls playsinline preload="metadata" poster="{{ .Params.image | relURL }}" aria-label="{{ .Title }}">
+        <source src="{{ .Params.video | relURL }}" type="video/mp4">
+        <a href="{{ .Params.video | relURL }}">Download video</a>
+      </video>
+      <p class="research-video-summary">{{ .Description }}</p>
+    </section>
+    {{ else }}
     <section class="research-abstract" aria-labelledby="abstract-heading">
       <h2 id="abstract-heading">Abstract</h2>
       {{ .Content }}
     </section>
+    {{ end }}
     <nav class="research-back research-back-bottom" aria-label="Back to research list">
       <a href="{{ .Parent.RelPermalink }}">&larr; Research</a>
     </nav>
