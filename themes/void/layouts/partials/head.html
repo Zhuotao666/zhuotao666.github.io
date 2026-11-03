@@ -8,10 +8,11 @@
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1220">
 <script>
   (function() {
-    var defaultDark = document.documentElement.dataset.defaultTheme === 'dark';
+    var defaultTheme = document.documentElement.dataset.defaultTheme;
+    var defaultDark = defaultTheme === 'dark';
     try {
       var t = localStorage.getItem('theme');
-      var dark = t === 'dark' || (t !== 'light' && (defaultDark || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)));
+      var dark = t === 'dark' || (t !== 'light' && (defaultDark || (!defaultTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)));
       if (dark) document.documentElement.classList.add('dark');
     } catch (_) { if (defaultDark) document.documentElement.classList.add('dark'); }
   })();

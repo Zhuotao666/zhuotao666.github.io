@@ -121,7 +121,8 @@
         try { v = localStorage.getItem(storageKey); } catch (_) {}
         if (v === 'dark') return 'dark';
         if (v === 'light') return 'light';
-        return root.dataset.defaultTheme === 'dark' || systemPrefersDark() ? 'dark' : 'light';
+        if (root.dataset.defaultTheme) return root.dataset.defaultTheme;
+        return systemPrefersDark() ? 'dark' : 'light';
       }
 
       function apply(theme) {

@@ -20,6 +20,35 @@
   let coastlines = [];
   let borders = [];
 
+  // Decorative regional tints, not elevation or land-cover measurements.
+  // Soft elliptical regions blend only into sampled land, never the ocean.
+  const terrainRegions = [
+    { center: [15, 24], spread: [28, 10], color: [194, 163, 111] }, // Sahara
+    { center: [46, 23], spread: [13, 9], color: [194, 163, 111] }, // Arabia
+    { center: [103, 43], spread: [15, 7], color: [188, 164, 121] }, // Gobi
+    { center: [134, -25], spread: [18, 10], color: [194, 155, 117] }, // Australia
+    { center: [21, -23], spread: [10, 10], color: [192, 162, 117] }, // Southern Africa
+    { center: [-113, 34], spread: [10, 8], color: [190, 164, 124] },
+    { center: [88, 33], spread: [15, 6], color: [153, 144, 142] }, // Tibetan Plateau
+    { center: [44, 33], spread: [13, 6], color: [164, 150, 137] }, // Western Asian plateaus
+    { center: [-69, -21], spread: [6, 19], color: [155, 145, 136] }, // Andes
+    { center: [38, 10], spread: [6, 7], color: [152, 150, 132] }, // Ethiopian Highlands
+    { center: [-63, -5], spread: [19, 12], color: [107, 151, 127] }, // Amazon
+    { center: [23, 0], spread: [13, 9], color: [107, 151, 127] } // Congo Basin
+  ];
+
+  function terrainColor(lon, lat) {
+    let color = [139, 164, 145];
+    for (const region of terrainRegions) {
+      const dx = (lon - region.center[0]) / region.spread[0];
+      const dy = (lat - region.center[1]) / region.spread[1];
+      const weight = Math.exp(-2 * (dx * dx + dy * dy));
+      color = color.map((value, i) => value + (region.color[i] - value) * weight);
+    }
+    const ice = Math.max(0, Math.min(1, (Math.abs(lat) - 62) / 16));
+    return color.map(value => Math.round(value + (225 - value) * ice));
+  }
+
   const surface = document.createElement('canvas');
   surface.width = surface.height = 240;
   const surfaceContext = surface.getContext('2d');
@@ -104,13 +133,19 @@
       for (let lat = -90; lat <= 90; lat += 3) points.push([lon, lat]);
       line(points);
     }
-    for (const [lon, lat] of land) {
+    for (const [lon, lat, color] of land) {
       const [x, y, z] = project(lon, lat, rotation);
       if (z <= 0) continue;
       const light = Math.max(0, x * sun[0] + y * sun[1] + z * sun[2]);
+      // Faint surface color sits under the finer land stippling and borders.
+      const fade = Math.min(1, z * 8);
+      context.fillStyle = `rgba(${color.join(',')}, ${(dark ? 0.16 : 0.23) * (0.6 + light * 0.4) * fade})`;
+      context.beginPath();
+      context.ellipse(centerX + x * radius, centerY - y * radius, radius * 0.017 * z, radius * 0.017, Math.atan2(-y, x), 0, Math.PI * 2);
+      context.fill();
       context.fillStyle = dark
-        ? `rgba(151, 199, 213, ${0.22 + light * 0.3})`
-        : `rgba(72, 123, 140, ${0.24 + light * 0.24})`;
+        ? `rgba(${color.join(',')}, ${0.28 + light * 0.3})`
+        : `rgba(${color.map(value => Math.max(0, value - 35)).join(',')}, ${0.25 + light * 0.22})`;
       context.beginPath();
       context.ellipse(centerX + x * radius, centerY - y * radius, Math.max(0.65, radius * 0.0022), Math.max(0.5, radius * 0.0022 * z), 0, 0, Math.PI * 2);
       context.fill();
@@ -191,7 +226,7 @@
         return response.json();
       })
       .then(data => {
-        land = data.land;
+        land = data.land.map(([lon, lat]) => [lon, lat, terrainColor(lon, lat)]);
         coastlines = data.coastlines;
         borders = data.borders;
         draw(); // Also update when reduced motion is enabled.
