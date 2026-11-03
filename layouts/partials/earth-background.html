@@ -2,7 +2,9 @@
 <link rel="stylesheet" href="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous">
 {{ end }}
 <div class="earth-background" aria-hidden="true">
-  <canvas id="earth-background"></canvas>
+  {{ with resources.Get "data/earth-map.json" | fingerprint }}
+  <canvas id="earth-background" data-map="{{ .RelPermalink }}"></canvas>
+  {{ end }}
 </div>
 {{ with resources.Get "js/earth-background.js" | minify | fingerprint }}
 <script defer src="{{ .RelPermalink }}" integrity="{{ .Data.Integrity }}" crossorigin="anonymous"></script>

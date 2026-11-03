@@ -117,10 +117,11 @@
       }
 
       function currentPref() {
-        const v = localStorage.getItem(storageKey);
+        let v;
+        try { v = localStorage.getItem(storageKey); } catch (_) {}
         if (v === 'dark') return 'dark';
         if (v === 'light') return 'light';
-        return systemPrefersDark() ? 'dark' : 'light';
+        return root.dataset.defaultTheme === 'dark' || systemPrefersDark() ? 'dark' : 'light';
       }
 
       function apply(theme) {
@@ -139,7 +140,7 @@
 
         btn.addEventListener('click', function () {
           theme = theme === 'dark' ? 'light' : 'dark';
-          localStorage.setItem(storageKey, theme);
+          try { localStorage.setItem(storageKey, theme); } catch (_) {}
           apply(theme);
           btn.blur();
         });

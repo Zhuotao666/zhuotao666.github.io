@@ -16,37 +16,9 @@
     ['PACIFIC OCEAN', -150, 14], ['ATLANTIC OCEAN', -35, 25],
     ['INDIAN OCEAN', 75, -18], ['ARCTIC OCEAN', 20, 79]
   ];
-  // Deliberately simplified geographic silhouettes, in longitude/latitude.
-  const continents = [
-    [[-168,65],[-145,71],[-125,70],[-110,73],[-85,70],[-60,53],[-65,46],[-81,25],[-97,18],[-106,24],[-117,32],[-125,49],[-150,59]],
-    [[-81,12],[-70,10],[-60,6],[-50,0],[-35,-7],[-40,-23],[-53,-34],[-68,-55],[-75,-40],[-80,-10]],
-    [[-53,60],[-42,61],[-20,76],[-30,83],[-55,80],[-65,68]],
-    [[-17,35],[4,37],[12,33],[32,31],[35,13],[51,11],[43,-12],[34,-26],[18,-35],[10,-20],[8,3],[-8,5],[-17,16]],
-    [[-10,36],[-10,44],[3,49],[8,55],[5,60],[20,71],[40,69],[60,73],[100,77],[140,71],[179,66],[170,55],[145,49],[140,35],[125,39],[121,23],[108,18],[105,5],[97,16],[88,22],[78,8],[69,24],[57,25],[45,12],[35,30],[27,41],[15,38],[9,44],[0,40]],
-    [[113,-22],[123,-14],[136,-12],[145,-17],[153,-27],[146,-39],[130,-33],[115,-35]],
-    [[47,-13],[51,-16],[48,-26],[44,-24]],
-    [[130,32],[135,35],[141,42],[145,44],[142,36]],
-    [[95,5],[106,-6],[119,-8],[130,-4],[141,-5],[150,-10],[136,-10],[120,-10],[108,-8]],
-    [[173,-34],[178,-39],[168,-47],[166,-44]],
-    [[-180,-75],[-130,-73],[-70,-68],[-30,-76],[30,-70],[90,-67],[150,-73],[180,-75],[180,-90],[-180,-90]]
-  ];
-
-  function inside(lon, lat, polygon) {
-    let result = false;
-    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const [x, y] = polygon[i];
-      const [px, py] = polygon[j];
-      if ((y > lat) !== (py > lat) && lon < (px - x) * (lat - y) / (py - y) + x) result = !result;
-    }
-    return result;
-  }
-
-  const land = [];
-  for (let lat = -82; lat <= 82; lat += 2.4) {
-    for (let lon = -180; lon < 180; lon += 2.4 / Math.max(0.2, Math.cos(lat * radians))) {
-      if (continents.some(polygon => inside(lon, lat, polygon))) land.push([lon, lat]);
-    }
-  }
+  let land = [];
+  let coastlines = [];
+  let borders = [];
 
   const surface = document.createElement('canvas');
   surface.width = surface.height = 240;
@@ -144,6 +116,14 @@
       context.fill();
     }
 
+    // Shared borders are stored once, so neighboring countries do not double-stroke.
+    context.lineWidth = 0.75;
+    context.strokeStyle = dark ? 'rgba(170, 209, 222, 0.49)' : 'rgba(60, 107, 127, 0.48)';
+    borders.forEach(line);
+    context.lineWidth = 1.15;
+    context.strokeStyle = dark ? 'rgba(184, 224, 233, 0.72)' : 'rgba(48, 99, 119, 0.67)';
+    coastlines.forEach(line);
+
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     const occupied = [];
@@ -202,4 +182,20 @@
   reducedMotion.addEventListener('change', syncAnimation);
   resize();
   syncAnimation();
+
+  // The fingerprinted same-origin data is cached independently of the animation.
+  if (canvas.dataset.map) {
+    fetch(canvas.dataset.map)
+      .then(response => {
+        if (!response.ok) throw new Error('Earth map unavailable');
+        return response.json();
+      })
+      .then(data => {
+        land = data.land;
+        coastlines = data.coastlines;
+        borders = data.borders;
+        draw(); // Also update when reduced motion is enabled.
+      })
+      .catch(() => { /* Keep the globe, grid and lighting if the map cannot load. */ });
+  }
 })();
