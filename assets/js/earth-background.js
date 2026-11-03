@@ -8,6 +8,14 @@
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const radians = Math.PI / 180;
   const tilt = -18 * radians;
+  // Five inhabited continents (the Americas grouped together), four oceans.
+  // English labels match the homepage; far-side labels are never drawn.
+  const labels = [
+    ['ASIA', 95, 45], ['EUROPE', 20, 54], ['AFRICA', 20, 12],
+    ['AMERICAS', -90, 30], ['OCEANIA', 135, -22],
+    ['PACIFIC OCEAN', -150, 14], ['ATLANTIC OCEAN', -35, 25],
+    ['INDIAN OCEAN', 75, -18], ['ARCTIC OCEAN', 20, 79]
+  ];
   // Deliberately simplified geographic silhouettes, in longitude/latitude.
   const continents = [
     [[-168,65],[-145,71],[-125,70],[-110,73],[-85,70],[-60,53],[-65,46],[-81,25],[-97,18],[-106,24],[-117,32],[-125,49],[-150,59]],
@@ -63,8 +71,19 @@
     const rotation = -1.5 + elapsed / 110000; // One revolution in about 11.5 minutes.
     const sunAngle = -0.85 + elapsed / 75000;
     const sun = [Math.sin(sunAngle), 0.25, Math.cos(sunAngle)];
-    const night = dark ? [28, 51, 78] : [153, 177, 199];
-    const day = dark ? [73, 115, 143] : [225, 237, 240];
+    const night = dark ? [28, 51, 78] : [133, 162, 188];
+    const day = dark ? [73, 115, 143] : [210, 230, 235];
+    // A distant warm light source follows the same direction as sphere lighting.
+    const sunX = centerX + sun[0] * radius * 1.15;
+    const sunY = centerY - radius * 1.03;
+    const glowSize = Math.max(width, height) * 0.52;
+    const glow = context.createRadialGradient(sunX, sunY, 0, sunX, sunY, glowSize);
+    glow.addColorStop(0, dark ? 'rgba(255, 229, 177, 0.28)' : 'rgba(255, 217, 151, 0.46)');
+    glow.addColorStop(0.12, 'rgba(255, 224, 172, 0.17)');
+    glow.addColorStop(0.45, 'rgba(246, 216, 173, 0.06)');
+    glow.addColorStop(1, 'rgba(255, 224, 172, 0)');
+    context.fillStyle = glow;
+    context.fillRect(0, 0, width, height);
     // Shade sphere normals to make a soft, moving day/night terminator.
     for (let y = 0; y < 240; y++) {
       for (let x = 0; x < 240; x++) {
@@ -81,8 +100,16 @@
     surfaceContext.putImageData(pixels, 0, 0);
     context.drawImage(surface, centerX - radius, centerY - radius, radius * 2, radius * 2);
 
-    context.lineWidth = 0.65;
-    context.strokeStyle = dark ? 'rgba(149, 194, 215, 0.24)' : 'rgba(88, 130, 151, 0.24)';
+    // A narrow atmospheric halo makes the curvature visible without a hard rim.
+    const atmosphere = context.createRadialGradient(centerX, centerY, radius * 0.97, centerX, centerY, radius * 1.025);
+    atmosphere.addColorStop(0, 'rgba(142, 196, 219, 0)');
+    atmosphere.addColorStop(0.5, dark ? 'rgba(155, 210, 235, 0.28)' : 'rgba(131, 185, 208, 0.23)');
+    atmosphere.addColorStop(1, 'rgba(142, 196, 219, 0)');
+    context.fillStyle = atmosphere;
+    context.fillRect(0, 0, width, height);
+
+    context.lineWidth = 0.85;
+    context.strokeStyle = dark ? 'rgba(149, 194, 215, 0.42)' : 'rgba(74, 117, 141, 0.40)';
     function line(points) {
       context.beginPath();
       let visible = false;
@@ -110,11 +137,30 @@
       if (z <= 0) continue;
       const light = Math.max(0, x * sun[0] + y * sun[1] + z * sun[2]);
       context.fillStyle = dark
-        ? `rgba(151, 199, 213, ${0.12 + light * 0.25})`
-        : `rgba(89, 137, 151, ${0.14 + light * 0.18})`;
+        ? `rgba(151, 199, 213, ${0.22 + light * 0.3})`
+        : `rgba(72, 123, 140, ${0.24 + light * 0.24})`;
       context.beginPath();
       context.ellipse(centerX + x * radius, centerY - y * radius, Math.max(0.65, radius * 0.0022), Math.max(0.5, radius * 0.0022 * z), 0, 0, Math.PI * 2);
       context.fill();
+    }
+
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    const occupied = [];
+    for (const [name, lon, lat] of labels) {
+      const [x, y, z] = project(lon, lat, rotation);
+      if (z < 0.18) continue;
+      const px = centerX + x * radius, py = centerY - y * radius;
+      const ocean = name.includes('OCEAN');
+      const fontSize = width < 640 ? 10 : 12;
+      context.font = `${ocean ? 'italic 400' : '500'} ${fontSize}px Georgia, serif`;
+      const halfWidth = context.measureText(name).width / 2 + 10;
+      if (px < halfWidth || px > width - halfWidth || py < 90 || py > height - 20) continue;
+      if (occupied.some(box => Math.abs(px - box.x) < halfWidth + box.halfWidth && Math.abs(py - box.y) < 24)) continue;
+      occupied.push({ x: px, y: py, halfWidth });
+      const alpha = Math.min(1, (z - 0.18) / 0.25) * (ocean ? 0.66 : 0.8);
+      context.fillStyle = dark ? `rgba(192, 218, 230, ${alpha})` : `rgba(48, 86, 110, ${alpha})`;
+      context.fillText(name, px, py);
     }
   }
 
