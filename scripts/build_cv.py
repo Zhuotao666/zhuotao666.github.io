@@ -26,11 +26,6 @@ PROJECTS = [
         "authors": "With JiHye Kim, Seona Park, and Ying Cao.",
     },
     {
-        "title": "Offshore Wind-Fishery Coexistence and Community Acceptance: A Field Study of Nanri Island in Fujian Province",
-        "authors": "With Seona PARK and Jing YU.",
-        "url": "https://localbiodiversityoutlooks.net/community-observations-biodiversity-change-wind-turbine/",
-    },
-    {
         "title": "The Efficiency of Typhoon Forecasts: Evidence from China's Public Typhoon Alert System",
         "authors": "With Yuqi Song and Zijun Liu.",
         "url": "https://repository.hkust-gz.edu.cn/itemDetail?id=2082671707485696002",
